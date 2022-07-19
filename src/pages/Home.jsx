@@ -8,7 +8,6 @@ import { Post } from "../components/Post";
 import { TagsBlock } from "../components/TagsBlock";
 import { CommentsBlock } from "../components/CommentsBlock";
 import { fetchPosts, fetchTags } from "../redux/slices/posts";
-import { selectIsAuth } from "../redux/slices/auth";
 export const Home = () => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.auth.data);
@@ -40,7 +39,13 @@ export const Home = () => {
                 key={index}
                 id={item._id}
                 title={item.title}
-                imageUrl={item.imageUrl}
+                imageUrl={
+                  item.imageUrl
+                    ? `${
+                        process.env.REACT_APP_API_URL || "http://localhost:5000"
+                      }${item.imageUrl}`
+                    : ""
+                }
                 user={item.author}
                 createdAt={item.createdAt}
                 viewsCount={item.viewsCount}
