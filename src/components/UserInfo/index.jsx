@@ -1,18 +1,13 @@
 import React from "react";
 import styles from "./UserInfo.module.scss";
+import { baseEnvUrl } from "../../consts";
 
 export const UserInfo = ({ avatarUrl, fullName, additionalText }) => {
   return (
     <div className={styles.root}>
       <img
         className={styles.avatar}
-        src={
-          avatarUrl
-            ? `${
-                process.env.REACT_APP_API_URL || "http://localhost:5000"
-              }${avatarUrl}`
-            : "/noavatar.png"
-        }
+        src={avatarUrl ? `${baseEnvUrl}${avatarUrl}` : "/noavatar.png"}
         alt={fullName}
       />
       <div className={styles.userDetails}>

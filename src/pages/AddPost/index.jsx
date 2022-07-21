@@ -9,6 +9,7 @@ import styles from "./AddPost.module.scss";
 import { useSelector } from "react-redux";
 import { selectIsAuth } from "../../redux/slices/auth";
 import axios from "../../axios";
+import { baseEnvUrl } from "../../consts";
 
 export const AddPost = () => {
   const { id } = useParams();
@@ -123,9 +124,7 @@ export const AddPost = () => {
           </Button>
           <img
             className={styles.image}
-            src={`${
-              process.env.REACT_APP_API_URL || "http://localhost:5000"
-            }${imageUrl}`}
+            src={`${baseEnvUrl}${imageUrl}`}
             alt="Uploaded"
           />
         </>

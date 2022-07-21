@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "../../axios";
 
 export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
@@ -33,7 +33,13 @@ const initialState = {
 const postsSlice = createSlice({
   name: "posts",
   initialState,
-  reducers: {},
+  reducers: {
+    sort: (state, value) => {
+      state.posts.items = state.posts.items.sort((a, b) =>
+        a[value.payload] < b[value.payload] ? 1 : -1
+      );
+    },
+  },
   extraReducers: {
     //Получение статей
     [fetchPosts.pending]: (state) => {
@@ -73,4 +79,5 @@ const postsSlice = createSlice({
   },
 });
 
+export const { sortPopular, sortNew, sort } = postsSlice.actions;
 export const postsReducer = postsSlice.reducer;
