@@ -55,11 +55,11 @@ export const FullPost = () => {
       <Post
         id={data._id}
         title={data.title}
-        imageUrl={data.imageUrl ? `${baseEnvUrl}${data.imageUrl}` : ""}
+        imageUrl={data.imageUrl ? baseEnvUrl + data.imageUrl : ""}
         user={data.author}
         createdAt={data.createdAt}
         viewsCount={data.viewsCount}
-        commentsCount={3}
+        commentsCount={comments?.length}
         tags={data.tags}
         isFullPost
       >

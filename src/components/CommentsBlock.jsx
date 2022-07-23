@@ -8,6 +8,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
 import List from "@mui/material/List";
 import Skeleton from "@mui/material/Skeleton";
+import { baseEnvUrl } from "../consts";
 
 export const CommentsBlock = ({ items, children, isLoading = true }) => {
   return (
@@ -22,7 +23,7 @@ export const CommentsBlock = ({ items, children, isLoading = true }) => {
                 ) : (
                   <Avatar
                     alt={obj.author.fullName}
-                    src={obj.author.avatarUrl}
+                    src={baseEnvUrl + obj.author.avatarUrl}
                   />
                 )}
               </ListItemAvatar>

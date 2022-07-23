@@ -3,10 +3,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Grid from "@mui/material/Grid";
 import { useDispatch, useSelector } from "react-redux";
-
-import { Post } from "../components/Post";
-import { TagsBlock } from "../components/TagsBlock";
-import { CommentsBlock } from "../components/CommentsBlock";
+import { TagsBlock, Post, CommentsBlock } from "../components";
 import { fetchPosts, fetchTags, sort } from "../redux/slices/posts";
 import axios from "../axios";
 import { baseEnvUrl } from "../consts";
@@ -34,8 +31,11 @@ export const Home = () => {
   useEffect(() => {
     dispatch(fetchPosts());
     dispatch(fetchTags());
-    getComments();
-  }, [dispatch, getComments]);
+  }, [dispatch]);
+
+  useEffect(() => {
+    getComments().then();
+  }, [getComments]);
 
   return (
     <>
@@ -47,9 +47,10 @@ export const Home = () => {
       >
         <Tab label="Новые" value={"createdAt"} />
         <Tab label="Популярные" value={"viewsCount"} />
+        <Tab label="Самые обсуждаемые" value={"comments"} />
       </Tabs>
       <Grid container spacing={4}>
-        <Grid xs={8} item>
+        <Grid sm={8} xs={12} item>
           {(isPostsLoading ? [...Array(5)] : posts.items).map((item, index) =>
             isPostsLoading ? (
               <Post key={index} isLoading={true} />
@@ -58,18 +59,18 @@ export const Home = () => {
                 key={index}
                 id={item._id}
                 title={item.title}
-                imageUrl={item.imageUrl ? `${baseEnvUrl}${item.imageUrl}` : ""}
+                imageUrl={item.imageUrl ? baseEnvUrl + item.imageUrl : ""}
                 user={item.author}
                 createdAt={item.createdAt}
                 viewsCount={item.viewsCount}
-                commentsCount={3}
+                commentsCount={item.comments?.length}
                 tags={item.tags}
                 isEditable={userData?._id === item.author._id}
               />
             )
           )}
         </Grid>
-        <Grid xs={4} item>
+        <Grid sm={4} xs={12} item>
           <TagsBlock items={tags.items} isLoading={isTagsLoading} />
           <CommentsBlock items={comments} isLoading={false} />
         </Grid>

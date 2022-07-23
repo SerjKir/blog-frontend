@@ -88,7 +88,6 @@ export const AddPost = () => {
   }, [id]);
 
   useEffect(() => {
-    console.log("effect");
     if (id) {
       getData();
     }
@@ -124,7 +123,7 @@ export const AddPost = () => {
           </Button>
           <img
             className={styles.image}
-            src={`${baseEnvUrl}${imageUrl}`}
+            src={baseEnvUrl + imageUrl}
             alt="Uploaded"
           />
         </>

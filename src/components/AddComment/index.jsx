@@ -17,10 +17,7 @@ export const Index = ({ avatar, addComment }) => {
   return (
     <>
       <div className={styles.root}>
-        <Avatar
-          classes={{ root: styles.avatar }}
-          src={`${baseEnvUrl}${avatar}`}
-        />
+        <Avatar classes={{ root: styles.avatar }} src={baseEnvUrl + avatar} />
         <div className={styles.form}>
           <TextField
             onChange={(e) => setText(e.target.value)}

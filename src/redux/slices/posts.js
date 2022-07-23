@@ -35,9 +35,13 @@ const postsSlice = createSlice({
   initialState,
   reducers: {
     sort: (state, value) => {
-      state.posts.items = state.posts.items.sort((a, b) =>
-        a[value.payload] < b[value.payload] ? 1 : -1
-      );
+      state.posts.items = state.posts.items.sort((a, b) => {
+        if (value.payload === "comments") {
+          return a[value.payload].length < b[value.payload].length ? 1 : -1;
+        } else {
+          return a[value.payload] < b[value.payload] ? 1 : -1;
+        }
+      });
     },
   },
   extraReducers: {
@@ -79,5 +83,5 @@ const postsSlice = createSlice({
   },
 });
 
-export const { sortPopular, sortNew, sort } = postsSlice.actions;
+export const { sort } = postsSlice.actions;
 export const postsReducer = postsSlice.reducer;

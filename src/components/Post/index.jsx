@@ -38,6 +38,7 @@ export const Post = ({
   if (isLoading) {
     return <PostSkeleton />;
   }
+  console.log();
 
   return (
     <div className={clsx(styles.root, { [styles.rootFull]: isFullPost })}>
