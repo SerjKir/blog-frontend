@@ -49,7 +49,7 @@ export const AddPost = () => {
       spellChecker: false,
       maxHeight: "400px",
       autofocus: true,
-      placeholder: "Введите текст...",
+      placeholder: "Enter text...",
       status: false,
       autosave: {
         enabled: true,
@@ -74,7 +74,7 @@ export const AddPost = () => {
       navigate(`/posts/${_id}`);
     } catch (error) {
       console.warn(error);
-      alert("Ошибка при создании статьи");
+      alert("Failed to create post");
     }
   };
 
@@ -104,7 +104,7 @@ export const AddPost = () => {
         variant="outlined"
         size="large"
       >
-        Загрузить превью
+        Load image
       </Button>
       <input
         ref={inputFileRef}
@@ -133,7 +133,7 @@ export const AddPost = () => {
       <TextField
         classes={{ root: styles.title }}
         variant="standard"
-        placeholder="Заголовок статьи..."
+        placeholder="Post title..."
         fullWidth
         value={title}
         onChange={(e) => setTitle(e.target.value)}
@@ -141,7 +141,7 @@ export const AddPost = () => {
       <TextField
         classes={{ root: styles.tags }}
         variant="standard"
-        placeholder="Тэги"
+        placeholder="Tags"
         fullWidth
         value={tags}
         onChange={(e) => setTags(e.target.value)}
@@ -154,10 +154,10 @@ export const AddPost = () => {
       />
       <div className={styles.buttons}>
         <Button onClick={onSubmit} size="large" variant="contained">
-          {isEditing ? "Сохранить" : "Опубликовать"}
+          {isEditing ? "Save" : "Publish"}
         </Button>
         <a href="/">
-          <Button size="large">Отмена</Button>
+          <Button size="large">Cancel</Button>
         </a>
       </div>
     </Paper>

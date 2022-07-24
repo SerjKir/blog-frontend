@@ -72,7 +72,6 @@ const postsSlice = createSlice({
       state.posts.status = "loading";
     },
     [fetchPostsByTag.fulfilled]: (state, action) => {
-      console.log(action.payload);
       state.posts.items = action.payload;
       state.posts.status = "loaded";
     },

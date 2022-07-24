@@ -47,18 +47,6 @@ const authSlice = createSlice({
     },
   },
   extraReducers: {
-    [fetchAuth.pending]: (state) => {
-      state.data = null;
-      state.status = "loading";
-    },
-    [fetchAuth.fulfilled]: (state, action) => {
-      state.data = action.payload;
-      state.status = "loaded";
-    },
-    [fetchAuth.rejected]: (state) => {
-      state.data = null;
-      state.status = "error";
-    },
     [fetchAuthMe.pending]: (state) => {
       state.data = null;
       state.status = "loading";

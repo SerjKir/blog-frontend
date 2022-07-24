@@ -56,9 +56,9 @@ export const Home = () => {
         aria-label="basic tabs example"
         onChange={handleChange}
       >
-        <Tab label="Новые" value={"createdAt"} />
-        <Tab label="Популярные" value={"viewsCount"} />
-        <Tab label="Самые обсуждаемые" value={"comments"} />
+        <Tab label="New" value={"createdAt"} />
+        <Tab label="Popular" value={"viewsCount"} />
+        <Tab label="Most viewed" value={"comments"} />
       </Tabs>
       <Grid container spacing={4}>
         <Grid sm={8} xs={12} item>

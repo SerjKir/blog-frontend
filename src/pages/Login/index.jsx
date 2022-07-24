@@ -16,7 +16,6 @@ export const Login = () => {
   const {
     register,
     handleSubmit,
-    setError,
     formState: { errors, isValid },
   } = useForm({
     defaultValues: { email: "admin1@gmail.com", password: "admin1" },
@@ -25,12 +24,10 @@ export const Login = () => {
 
   const onSubmit = async (values) => {
     const data = await dispatch(fetchAuth(values));
-    if (!data.payload) {
+    if (!data.payload || data.payload === "") {
       return alert("Не удалось авторизоваться");
     }
-    if ("token" in data.payload) {
-      window.localStorage.setItem("token", data.payload.token);
-    }
+    window.localStorage.setItem("token", data.payload);
     dispatch(setToken());
   };
 
@@ -69,7 +66,7 @@ export const Login = () => {
           variant="contained"
           fullWidth
         >
-          Войти
+          Login
         </Button>
       </form>
     </Paper>
