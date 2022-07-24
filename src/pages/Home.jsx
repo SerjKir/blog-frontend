@@ -4,9 +4,15 @@ import Tab from "@mui/material/Tab";
 import Grid from "@mui/material/Grid";
 import { useDispatch, useSelector } from "react-redux";
 import { TagsBlock, Post, CommentsBlock } from "../components";
-import { fetchPosts, fetchTags, sort } from "../redux/slices/posts";
+import {
+  fetchPosts,
+  fetchPostsByTag,
+  fetchTags,
+  sort,
+} from "../redux/slices/posts";
 import axios from "../axios";
 import { baseEnvUrl } from "../consts";
+import { useParams } from "react-router-dom";
 export const Home = () => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.auth.data);
@@ -15,9 +21,10 @@ export const Home = () => {
   const isTagsLoading = tags.status === "loading";
   const [comments, setComments] = useState([]);
   const [sortValue, setSortValue] = useState("createdAt");
+  const { id } = useParams();
 
   const getComments = useCallback(async () => {
-    await axios.get("/comments").then(({ data }) => setComments(data));
+    await axios.get("/posts/comments").then(({ data }) => setComments(data));
   }, []);
 
   const handleChange = (event, newValue) => {
@@ -29,9 +36,13 @@ export const Home = () => {
   }, [sortValue, dispatch]);
 
   useEffect(() => {
-    dispatch(fetchPosts());
+    if (window.location.pathname.includes("/tags/")) {
+      dispatch(fetchPostsByTag(id));
+    } else {
+      dispatch(fetchPosts());
+    }
     dispatch(fetchTags());
-  }, [dispatch]);
+  }, [dispatch, id]);
 
   useEffect(() => {
     getComments().then();

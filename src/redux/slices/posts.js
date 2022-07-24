@@ -7,9 +7,17 @@ export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
 });
 
 export const fetchTags = createAsyncThunk("posts/fetchTags", async () => {
-  const { data } = await axios.get("/tags");
+  const { data } = await axios.get("/posts/tags");
   return data;
 });
+
+export const fetchPostsByTag = createAsyncThunk(
+  "posts/fetchPostsByTag",
+  async (tag) => {
+    const { data } = await axios.get(`/posts/tags/${tag}`);
+    return data;
+  }
+);
 
 export const fetchRemovePost = createAsyncThunk(
   "posts/fetchRemovePost",
@@ -55,6 +63,20 @@ const postsSlice = createSlice({
       state.posts.status = "loaded";
     },
     [fetchPosts.rejected]: (state) => {
+      state.posts.items = [];
+      state.posts.status = "error";
+    },
+    //Получение статей по тегу
+    [fetchPostsByTag.pending]: (state) => {
+      state.posts.items = [];
+      state.posts.status = "loading";
+    },
+    [fetchPostsByTag.fulfilled]: (state, action) => {
+      console.log(action.payload);
+      state.posts.items = action.payload;
+      state.posts.status = "loaded";
+    },
+    [fetchPostsByTag.rejected]: (state) => {
       state.posts.items = [];
       state.posts.status = "error";
     },

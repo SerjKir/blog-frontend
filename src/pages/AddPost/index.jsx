@@ -83,7 +83,7 @@ export const AddPost = () => {
       setTitle(data.title);
       setText(data.text);
       setImageUrl(data.imageUrl);
-      setTags(data.tags?.join(", "));
+      setTags(data.tags?.join(","));
     });
   }, [id]);
 

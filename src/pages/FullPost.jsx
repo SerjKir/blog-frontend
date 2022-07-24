@@ -1,14 +1,17 @@
 import React, { useCallback, useEffect, useState } from "react";
 
-import { Post } from "../components/Post";
-import { Index } from "../components/AddComment";
-import { CommentsBlock } from "../components/CommentsBlock";
+import { Post } from "../components";
+import { Index } from "../components";
+import { CommentsBlock } from "../components";
 import { useParams } from "react-router-dom";
 import axios from "../axios";
 import ReactMarkdown from "react-markdown";
 import { baseEnvUrl } from "../consts";
+import { useSelector } from "react-redux";
+import { selectIsAuth } from "../redux/slices/auth";
 
 export const FullPost = () => {
+  const isAuth = useSelector(selectIsAuth);
   const { id } = useParams();
   const [data, setData] = useState();
   const [comments, setComments] = useState();
@@ -18,7 +21,7 @@ export const FullPost = () => {
     setIsLoading(true);
     await axios
       .get(`/posts/${id}`)
-      .then((res) => setData(res.data))
+      .then(({ data }) => setData(data))
       .catch((error) => {
         console.log(error);
         alert(error);
@@ -66,7 +69,11 @@ export const FullPost = () => {
         <ReactMarkdown children={data.text} />
       </Post>
       <CommentsBlock items={comments} isLoading={false}>
-        <Index avatar={data.author.avatarUrl} addComment={addComment} />
+        {isAuth ? (
+          <Index avatar={data.author.avatarUrl} addComment={addComment} />
+        ) : (
+          ""
+        )}
       </CommentsBlock>
     </>
   );
