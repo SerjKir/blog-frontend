@@ -9,6 +9,7 @@ import ReactMarkdown from "react-markdown";
 import { baseEnvUrl } from "../consts";
 import { useSelector } from "react-redux";
 import { selectIsAuth } from "../redux/slices/auth";
+import Grid from "@mui/material/Grid";
 
 export const FullPost = () => {
   const isAuth = useSelector(selectIsAuth);
@@ -24,7 +25,6 @@ export const FullPost = () => {
       .then(({ data }) => setData(data))
       .catch((error) => {
         console.log(error);
-        alert(error);
       });
     setIsLoading(false);
   }, [id]);
@@ -35,7 +35,6 @@ export const FullPost = () => {
       .then(({ data }) => setComments(data))
       .catch((error) => {
         console.log(error);
-        alert(error);
       });
   }, [id]);
 
@@ -54,27 +53,31 @@ export const FullPost = () => {
   }
 
   return (
-    <>
-      <Post
-        id={data._id}
-        title={data.title}
-        imageUrl={data.imageUrl ? baseEnvUrl + data.imageUrl : ""}
-        user={data.author}
-        createdAt={data.createdAt}
-        viewsCount={data.viewsCount}
-        commentsCount={comments?.length}
-        tags={data.tags}
-        isFullPost
-      >
-        <ReactMarkdown children={data.text} />
-      </Post>
-      <CommentsBlock items={comments} isLoading={false}>
-        {isAuth ? (
-          <Index avatar={data.author.avatarUrl} addComment={addComment} />
-        ) : (
-          ""
-        )}
-      </CommentsBlock>
-    </>
+    <Grid container spacing={4}>
+      <Grid sm={8} xs={12} item>
+        <Post
+          id={data._id}
+          title={data.title}
+          imageUrl={data.imageUrl ? baseEnvUrl + data.imageUrl : ""}
+          user={data.author}
+          createdAt={data.createdAt}
+          viewsCount={data.viewsCount}
+          commentsCount={comments?.length}
+          tags={data.tags}
+          isFullPost
+        >
+          <ReactMarkdown children={data.text} />
+        </Post>
+      </Grid>
+      <Grid sm={4} xs={12} item>
+        <CommentsBlock items={comments} isLoading={false}>
+          {isAuth ? (
+            <Index avatar={data.author.avatarUrl} addComment={addComment} />
+          ) : (
+            ""
+          )}
+        </CommentsBlock>
+      </Grid>
+    </Grid>
   );
 };

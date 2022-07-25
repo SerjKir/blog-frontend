@@ -1,10 +1,16 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "../../axios";
 
-export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
-  const { data } = await axios.get("/posts");
-  return data;
-});
+export const fetchPosts = createAsyncThunk(
+  "posts/fetchPosts",
+  async (params) => {
+    const { currentPage, pageLimit } = params;
+    const { data } = await axios.get("/posts?", {
+      params: { currentPage, pageLimit },
+    });
+    return data;
+  }
+);
 
 export const fetchTags = createAsyncThunk("posts/fetchTags", async () => {
   const { data } = await axios.get("/posts/tags");
@@ -13,8 +19,11 @@ export const fetchTags = createAsyncThunk("posts/fetchTags", async () => {
 
 export const fetchPostsByTag = createAsyncThunk(
   "posts/fetchPostsByTag",
-  async (tag) => {
-    const { data } = await axios.get(`/posts/tags/${tag}`);
+  async (params) => {
+    const { id, currentPage, pageLimit } = params;
+    const { data } = await axios.get(`/posts/tags/${id}`, {
+      params: { currentPage, pageLimit },
+    });
     return data;
   }
 );
@@ -36,6 +45,9 @@ const initialState = {
     items: [],
     status: "loading",
   },
+  total: 0,
+  currentPage: 1,
+  sortType: "createdAt",
 };
 
 const postsSlice = createSlice({
@@ -51,6 +63,12 @@ const postsSlice = createSlice({
         }
       });
     },
+    setCurrentPage: (state) => {
+      state.currentPage = state.currentPage + 1;
+    },
+    setSortType: (state, value) => {
+      state.sortType = value.payload;
+    },
   },
   extraReducers: {
     //Получение статей
@@ -59,7 +77,8 @@ const postsSlice = createSlice({
       state.posts.status = "loading";
     },
     [fetchPosts.fulfilled]: (state, action) => {
-      state.posts.items = action.payload;
+      state.total = action.payload.total;
+      state.posts.items = action.payload.posts;
       state.posts.status = "loaded";
     },
     [fetchPosts.rejected]: (state) => {
@@ -72,7 +91,8 @@ const postsSlice = createSlice({
       state.posts.status = "loading";
     },
     [fetchPostsByTag.fulfilled]: (state, action) => {
-      state.posts.items = action.payload;
+      state.total = action.payload.total;
+      state.posts.items = action.payload.posts;
       state.posts.status = "loaded";
     },
     [fetchPostsByTag.rejected]: (state) => {
@@ -104,5 +124,5 @@ const postsSlice = createSlice({
   },
 });
 
-export const { sort } = postsSlice.actions;
+export const { sort, setCurrentPage, setSortType } = postsSlice.actions;
 export const postsReducer = postsSlice.reducer;

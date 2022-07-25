@@ -8,7 +8,12 @@ import { Navigate } from "react-router-dom";
 
 import styles from "./Login.module.scss";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAuth, setToken, selectIsAuth } from "../../redux/slices/auth";
+import {
+  fetchAuth,
+  setToken,
+  selectIsAuth,
+  fetchAuthMe,
+} from "../../redux/slices/auth";
 
 export const Login = () => {
   const isAuth = useSelector(selectIsAuth);
@@ -29,6 +34,7 @@ export const Login = () => {
     }
     window.localStorage.setItem("token", data.payload);
     dispatch(setToken());
+    dispatch(fetchAuthMe());
   };
 
   if (isAuth) {

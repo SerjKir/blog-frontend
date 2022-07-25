@@ -39,7 +39,7 @@ export const CommentsBlock = ({ items, children, isLoading = true }) => {
                 />
               )}
             </ListItem>
-            <Divider variant="inset" component="li" />
+            <Divider variant={"fullWidth"} component="li" />
           </React.Fragment>
         ))}
       </List>

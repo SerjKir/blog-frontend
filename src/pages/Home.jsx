@@ -8,41 +8,54 @@ import {
   fetchPosts,
   fetchPostsByTag,
   fetchTags,
+  setCurrentPage,
+  setSortType,
   sort,
 } from "../redux/slices/posts";
 import axios from "../axios";
 import { baseEnvUrl } from "../consts";
 import { useParams } from "react-router-dom";
+import Button from "@mui/material/Button";
 export const Home = () => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.auth.data);
-  const { posts, tags } = useSelector((state) => state.posts);
+  const { posts, tags, sortType, currentPage, total } = useSelector(
+    (state) => state.posts
+  );
   const isPostsLoading = posts.status === "loading";
   const isTagsLoading = tags.status === "loading";
   const [comments, setComments] = useState([]);
-  const [sortValue, setSortValue] = useState("createdAt");
   const { id } = useParams();
+  const pageLimit = 3;
 
   const getComments = useCallback(async () => {
     await axios.get("/posts/comments").then(({ data }) => setComments(data));
   }, []);
 
   const handleChange = (event, newValue) => {
-    setSortValue(newValue);
+    dispatch(setSortType(newValue));
+  };
+
+  const getPostsData = useCallback(() => {
+    if (window.location.pathname.includes("/tags/")) {
+      dispatch(fetchPostsByTag({ id, currentPage, pageLimit }));
+    } else {
+      dispatch(fetchPosts({ currentPage, pageLimit }));
+    }
+    dispatch(fetchTags());
+  }, [dispatch, id, currentPage]);
+
+  const loadMore = () => {
+    dispatch(setCurrentPage());
   };
 
   useEffect(() => {
-    dispatch(sort(sortValue));
-  }, [sortValue, dispatch]);
+    getPostsData();
+  }, [getPostsData]);
 
   useEffect(() => {
-    if (window.location.pathname.includes("/tags/")) {
-      dispatch(fetchPostsByTag(id));
-    } else {
-      dispatch(fetchPosts());
-    }
-    dispatch(fetchTags());
-  }, [dispatch, id]);
+    dispatch(sort(sortType));
+  }, [sortType, dispatch, posts.status]);
 
   useEffect(() => {
     getComments().then();
@@ -51,14 +64,14 @@ export const Home = () => {
   return (
     <>
       <Tabs
-        value={sortValue}
+        value={sortType}
         style={{ marginBottom: 15 }}
         aria-label="basic tabs example"
         onChange={handleChange}
       >
         <Tab label="New" value={"createdAt"} />
         <Tab label="Popular" value={"viewsCount"} />
-        <Tab label="Most viewed" value={"comments"} />
+        <Tab label="Most commented" value={"comments"} />
       </Tabs>
       <Grid container spacing={4}>
         <Grid sm={8} xs={12} item>
@@ -86,6 +99,11 @@ export const Home = () => {
           <CommentsBlock items={comments} isLoading={false} />
         </Grid>
       </Grid>
+      {Math.ceil(total / pageLimit) > currentPage && (
+        <Button variant="contained" onClick={loadMore}>
+          Load more
+        </Button>
+      )}
     </>
   );
 };
