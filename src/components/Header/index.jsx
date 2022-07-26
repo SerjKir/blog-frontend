@@ -6,10 +6,14 @@ import styles from "./Header.module.scss";
 import Container from "@mui/material/Container";
 import { useDispatch, useSelector } from "react-redux";
 import { logout, selectIsAuth } from "../../redux/slices/auth";
+import { resetCurrentPage } from "../../redux/slices/posts";
 
 export const Header = () => {
   const dispatch = useDispatch();
   const isAuth = useSelector(selectIsAuth);
+  const resetPage = () => {
+    dispatch(resetCurrentPage());
+  };
 
   const onClickLogout = () => {
     if (window.confirm("Are you sure you want to logout?")) {
@@ -22,9 +26,9 @@ export const Header = () => {
     <div className={styles.root}>
       <Container maxWidth="lg">
         <div className={styles.inner}>
-          <a className={styles.logo} href="/">
-            <div>Main</div>
-          </a>
+          <Link className={styles.logo} to={"/"}>
+            <div onClick={resetPage}>Main</div>
+          </Link>
           <div className={styles.buttons}>
             {isAuth ? (
               <>

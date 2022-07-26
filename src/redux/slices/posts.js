@@ -69,6 +69,9 @@ const postsSlice = createSlice({
     setSortType: (state, value) => {
       state.sortType = value.payload;
     },
+    resetCurrentPage: (state) => {
+      state.currentPage = 1;
+    },
   },
   extraReducers: {
     //Получение статей
@@ -124,5 +127,6 @@ const postsSlice = createSlice({
   },
 });
 
-export const { sort, setCurrentPage, setSortType } = postsSlice.actions;
+export const { sort, setCurrentPage, setSortType, resetCurrentPage } =
+  postsSlice.actions;
 export const postsReducer = postsSlice.reducer;

@@ -93,17 +93,17 @@ export const Home = () => {
               />
             )
           )}
+          {Math.ceil(total / pageLimit) > currentPage && (
+            <Button variant="contained" onClick={loadMore}>
+              Load more
+            </Button>
+          )}
         </Grid>
         <Grid sm={4} xs={12} item>
           <TagsBlock items={tags.items} isLoading={isTagsLoading} />
           <CommentsBlock items={comments} isLoading={false} />
         </Grid>
       </Grid>
-      {Math.ceil(total / pageLimit) > currentPage && (
-        <Button variant="contained" onClick={loadMore}>
-          Load more
-        </Button>
-      )}
     </>
   );
 };
