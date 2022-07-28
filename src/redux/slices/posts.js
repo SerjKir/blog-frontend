@@ -5,17 +5,34 @@ export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",
   async (params) => {
     const { currentPage, pageLimit } = params;
-    const { data } = await axios.get("/posts?", {
+    const { data } = await axios.get("/posts", {
       params: { currentPage, pageLimit },
     });
     return data;
   }
 );
 
-export const fetchTags = createAsyncThunk("posts/fetchTags", async () => {
-  const { data } = await axios.get("/posts/tags");
-  return data;
-});
+export const fetchLastTags = createAsyncThunk(
+  "posts/fetchTags",
+  async (params) => {
+    const { tagsLimit } = params;
+    const { data } = await axios.get("/posts/tags", {
+      params: { tagsLimit },
+    });
+    return data;
+  }
+);
+
+export const fetchLastComments = createAsyncThunk(
+  "posts/fetchComments",
+  async (params) => {
+    const { commentsLimit } = params;
+    const { data } = await axios.get("/posts/comments", {
+      params: { commentsLimit },
+    });
+    return data;
+  }
+);
 
 export const fetchPostsByTag = createAsyncThunk(
   "posts/fetchPostsByTag",
@@ -42,6 +59,10 @@ const initialState = {
     status: "loading",
   },
   tags: {
+    items: [],
+    status: "loading",
+  },
+  comments: {
     items: [],
     status: "loading",
   },
@@ -102,18 +123,31 @@ const postsSlice = createSlice({
       state.posts.items = [];
       state.posts.status = "error";
     },
-    //Получение тегов
-    [fetchTags.pending]: (state) => {
+    //Получение последних тегов
+    [fetchLastTags.pending]: (state) => {
       state.tags.items = [];
       state.tags.status = "loading";
     },
-    [fetchTags.fulfilled]: (state, action) => {
+    [fetchLastTags.fulfilled]: (state, action) => {
       state.tags.items = action.payload;
       state.tags.status = "loaded";
     },
-    [fetchTags.rejected]: (state) => {
+    [fetchLastTags.rejected]: (state) => {
       state.tags.items = [];
       state.tags.status = "error";
+    },
+    //Получение последних комментариев
+    [fetchLastComments.pending]: (state) => {
+      state.comments.items = [];
+      state.comments.status = "loading";
+    },
+    [fetchLastComments.fulfilled]: (state, action) => {
+      state.comments.items = action.payload;
+      state.comments.status = "loaded";
+    },
+    [fetchLastComments.rejected]: (state) => {
+      state.comments.items = [];
+      state.comments.status = "error";
     },
     //Удаление статьи
     [fetchRemovePost.pending]: (state, action) => {

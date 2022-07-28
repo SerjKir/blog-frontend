@@ -14,7 +14,7 @@ export const CommentsBlock = ({ items, children, isLoading = true }) => {
   return (
     <SideBlock title="Comments">
       <List>
-        {(isLoading ? [...Array(5)] : items)?.map((obj, index) => (
+        {(isLoading ? [...Array(3)] : items)?.map((obj, index) => (
           <React.Fragment key={index}>
             <ListItem alignItems="flex-start">
               <ListItemAvatar>
@@ -29,8 +29,8 @@ export const CommentsBlock = ({ items, children, isLoading = true }) => {
               </ListItemAvatar>
               {isLoading ? (
                 <div style={{ display: "flex", flexDirection: "column" }}>
-                  <Skeleton variant="text" height={25} width={120} />
-                  <Skeleton variant="text" height={18} width={230} />
+                  <Skeleton variant="text" height={24} width={80} />
+                  <Skeleton variant="text" height={20} width={160} />
                 </div>
               ) : (
                 <ListItemText
