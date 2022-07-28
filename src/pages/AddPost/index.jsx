@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import TextField from "@mui/material/TextField";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
@@ -40,11 +46,11 @@ export const AddPost = () => {
     setImageUrl("");
   };
 
-  const onChange = React.useCallback((value) => {
+  const onChange = useCallback((value) => {
     setText(value);
   }, []);
 
-  const options = React.useMemo(
+  const options = useMemo(
     () => ({
       spellChecker: false,
       maxHeight: "400px",
@@ -54,6 +60,7 @@ export const AddPost = () => {
       autosave: {
         enabled: true,
         delay: 1000,
+        uniqueId: "postEditor",
       },
     }),
     []
@@ -151,6 +158,7 @@ export const AddPost = () => {
         value={text}
         onChange={onChange}
         options={options}
+        id="postEditor"
       />
       <div className={styles.buttons}>
         <Button onClick={onSubmit} size="large" variant="contained">
