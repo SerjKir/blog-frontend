@@ -12,6 +12,7 @@ import {
   setCurrentPage,
   setSortType,
   sort,
+  setScrollPosition,
 } from "../redux/slices/posts";
 import { baseEnvUrl } from "../consts";
 import { useParams } from "react-router-dom";
@@ -19,9 +20,15 @@ import Button from "@mui/material/Button";
 export const Home = () => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.auth.data);
-  const { posts, tags, comments, sortType, currentPage, total } = useSelector(
-    (state) => state.posts
-  );
+  const {
+    posts,
+    tags,
+    comments,
+    sortType,
+    currentPage,
+    total,
+    scrollPosition,
+  } = useSelector((state) => state.posts);
   const isPostsLoading = posts.status === "loading";
   const isTagsLoading = tags.status === "loading";
   const isCommentsLoading = comments.status === "loading";
@@ -33,6 +40,17 @@ export const Home = () => {
   const handleChange = (event, newValue) => {
     dispatch(setSortType(newValue));
   };
+
+  //Сохранение позиции скрола при переходе к полному посту
+  const setScroll = () => {
+    dispatch(setScrollPosition());
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      window.scrollTo(scrollPosition.scrollX, scrollPosition.scrollY);
+    }, 500);
+  }, [scrollPosition.scrollX, scrollPosition.scrollY]);
 
   const loadMore = () => {
     dispatch(setCurrentPage());
@@ -84,6 +102,7 @@ export const Home = () => {
                   commentsCount={item.comments?.length}
                   tags={item.tags}
                   isEditable={userData?._id === item.author._id}
+                  setScroll={setScroll}
                 />
               )
           )}

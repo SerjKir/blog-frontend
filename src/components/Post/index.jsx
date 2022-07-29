@@ -26,6 +26,7 @@ export const Post = ({
   isFullPost,
   isLoading,
   isEditable,
+  setScroll,
 }) => {
   const dispatch = useDispatch();
 
@@ -66,7 +67,13 @@ export const Post = ({
           <h2
             className={clsx(styles.title, { [styles.titleFull]: isFullPost })}
           >
-            {isFullPost ? title : <Link to={`/posts/${id}`}>{title}</Link>}
+            {isFullPost ? (
+              title
+            ) : (
+              <Link onClick={setScroll} to={`/posts/${id}`}>
+                {title}
+              </Link>
+            )}
           </h2>
           <ul className={styles.tags}>
             {tags.map((name) => (

@@ -69,6 +69,10 @@ const initialState = {
   total: 0,
   currentPage: 1,
   sortType: "createdAt",
+  scrollPosition: {
+    scrollX: 0,
+    scrollY: 0,
+  },
 };
 
 const postsSlice = createSlice({
@@ -92,6 +96,10 @@ const postsSlice = createSlice({
     },
     resetCurrentPage: (state) => {
       state.currentPage = 1;
+    },
+    setScrollPosition: (state) => {
+      state.scrollPosition.scrollX = window.scrollX;
+      state.scrollPosition.scrollY = window.scrollY;
     },
   },
   extraReducers: {
@@ -161,6 +169,11 @@ const postsSlice = createSlice({
   },
 });
 
-export const { sort, setCurrentPage, setSortType, resetCurrentPage } =
-  postsSlice.actions;
+export const {
+  sort,
+  setCurrentPage,
+  setSortType,
+  resetCurrentPage,
+  setScrollPosition,
+} = postsSlice.actions;
 export const postsReducer = postsSlice.reducer;
