@@ -4,9 +4,9 @@ import axios from "../../axios";
 export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",
   async (params) => {
-    const { currentPage, pageLimit } = params;
+    const { page, limit } = params;
     const { data } = await axios.get("/posts", {
-      params: { currentPage, pageLimit },
+      params: { page, limit },
     });
     return data;
   }
@@ -15,9 +15,9 @@ export const fetchPosts = createAsyncThunk(
 export const fetchLastTags = createAsyncThunk(
   "posts/fetchTags",
   async (params) => {
-    const { tagsLimit } = params;
+    const { limit } = params;
     const { data } = await axios.get("/posts/tags", {
-      params: { tagsLimit },
+      params: { limit },
     });
     return data;
   }
@@ -26,9 +26,9 @@ export const fetchLastTags = createAsyncThunk(
 export const fetchLastComments = createAsyncThunk(
   "posts/fetchComments",
   async (params) => {
-    const { commentsLimit } = params;
+    const { limit } = params;
     const { data } = await axios.get("/posts/comments", {
-      params: { commentsLimit },
+      params: { limit },
     });
     return data;
   }
@@ -37,9 +37,9 @@ export const fetchLastComments = createAsyncThunk(
 export const fetchPostsByTag = createAsyncThunk(
   "posts/fetchPostsByTag",
   async (params) => {
-    const { id, currentPage, pageLimit } = params;
+    const { id, page, limit } = params;
     const { data } = await axios.get(`/posts/tags/${id}`, {
-      params: { currentPage, pageLimit },
+      params: { page, limit },
     });
     return data;
   }
@@ -69,10 +69,6 @@ const initialState = {
   total: 0,
   currentPage: 1,
   sortType: "createdAt",
-  scrollPosition: {
-    scrollX: 0,
-    scrollY: 0,
-  },
 };
 
 const postsSlice = createSlice({
@@ -80,32 +76,36 @@ const postsSlice = createSlice({
   initialState,
   reducers: {
     sort: (state, value) => {
+      const type = state.sortType;
       state.posts.items = state.posts.items.sort((a, b) => {
-        if (value.payload === "comments") {
-          return a[value.payload].length < b[value.payload].length ? 1 : -1;
+        if (type === "comments") {
+          return a[type].length < b[type].length ? 1 : -1;
         } else {
-          return a[value.payload] < b[value.payload] ? 1 : -1;
+          return a[type] < b[type] ? 1 : -1;
         }
       });
-    },
-    setCurrentPage: (state) => {
-      state.currentPage = state.currentPage + 1;
     },
     setSortType: (state, value) => {
       state.sortType = value.payload;
     },
+    setCurrentPage: (state) => {
+      state.currentPage = state.currentPage + 1;
+    },
     resetCurrentPage: (state) => {
       state.currentPage = 1;
     },
-    setScrollPosition: (state) => {
-      state.scrollPosition.scrollX = window.scrollX;
-      state.scrollPosition.scrollY = window.scrollY;
+    resetPosts: (state) => {
+      state.posts.items = [];
+    },
+    resetDefault: (state) => {
+      state.posts.items = [];
+      state.currentPage = 1;
+      // state.sortType = "createdAt";
     },
   },
   extraReducers: {
     //Получение статей
     [fetchPosts.pending]: (state) => {
-      state.posts.items = [];
       state.posts.status = "loading";
     },
     [fetchPosts.fulfilled]: (state, action) => {
@@ -119,7 +119,6 @@ const postsSlice = createSlice({
     },
     //Получение статей по тегу
     [fetchPostsByTag.pending]: (state) => {
-      state.posts.items = [];
       state.posts.status = "loading";
     },
     [fetchPostsByTag.fulfilled]: (state, action) => {
@@ -133,7 +132,6 @@ const postsSlice = createSlice({
     },
     //Получение последних тегов
     [fetchLastTags.pending]: (state) => {
-      state.tags.items = [];
       state.tags.status = "loading";
     },
     [fetchLastTags.fulfilled]: (state, action) => {
@@ -146,7 +144,6 @@ const postsSlice = createSlice({
     },
     //Получение последних комментариев
     [fetchLastComments.pending]: (state) => {
-      state.comments.items = [];
       state.comments.status = "loading";
     },
     [fetchLastComments.fulfilled]: (state, action) => {
@@ -169,11 +166,6 @@ const postsSlice = createSlice({
   },
 });
 
-export const {
-  sort,
-  setCurrentPage,
-  setSortType,
-  resetCurrentPage,
-  setScrollPosition,
-} = postsSlice.actions;
+export const { sort, setCurrentPage, setSortType, resetDefault } =
+  postsSlice.actions;
 export const postsReducer = postsSlice.reducer;

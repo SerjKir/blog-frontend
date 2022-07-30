@@ -12,12 +12,14 @@ import styles from "./Components.module.scss";
 import { SideBlock } from "./SideBlock";
 import { NavLink } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { resetCurrentPage } from "../redux/slices/posts";
+import { resetDefault } from "../redux/slices/posts";
 
 export const TagsBlock = ({ items, isLoading = true }) => {
   const dispatch = useDispatch();
-  const resetPage = () => {
-    dispatch(resetCurrentPage());
+  const reset = (name) => {
+    if (window.location.pathname !== `/tags/${name}`) {
+      dispatch(resetDefault());
+    }
   };
   return (
     <SideBlock title="Tags">
@@ -26,7 +28,7 @@ export const TagsBlock = ({ items, isLoading = true }) => {
           <ListItem key={i} disablePadding>
             <NavLink
               to={`/tags/${name}`}
-              onClick={resetPage}
+              onClick={() => reset(name)}
               className={styles.tagsLink}
               style={({ isActive }) => ({
                 color: isActive ? "blue" : "black",

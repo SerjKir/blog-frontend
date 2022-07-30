@@ -12,7 +12,6 @@ import {
   setCurrentPage,
   setSortType,
   sort,
-  setScrollPosition,
 } from "../redux/slices/posts";
 import { baseEnvUrl } from "../consts";
 import { useParams } from "react-router-dom";
@@ -20,15 +19,9 @@ import Button from "@mui/material/Button";
 export const Home = () => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.auth.data);
-  const {
-    posts,
-    tags,
-    comments,
-    sortType,
-    currentPage,
-    total,
-    scrollPosition,
-  } = useSelector((state) => state.posts);
+  const { posts, tags, comments, sortType, currentPage, total } = useSelector(
+    (state) => state.posts
+  );
   const isPostsLoading = posts.status === "loading";
   const isTagsLoading = tags.status === "loading";
   const isCommentsLoading = comments.status === "loading";
@@ -36,21 +29,11 @@ export const Home = () => {
   const pageLimit = 5,
     commentsLimit = 3,
     tagsLimit = 5;
+  const isSkeleton = isPostsLoading && posts.items.length === 0;
 
   const handleChange = (event, newValue) => {
     dispatch(setSortType(newValue));
   };
-
-  //Сохранение позиции скрола при переходе к полному посту
-  const setScroll = () => {
-    dispatch(setScrollPosition());
-  };
-
-  useEffect(() => {
-    setTimeout(() => {
-      window.scrollTo(scrollPosition.scrollX, scrollPosition.scrollY);
-    }, 500);
-  }, [scrollPosition.scrollX, scrollPosition.scrollY]);
 
   const loadMore = () => {
     dispatch(setCurrentPage());
@@ -58,10 +41,10 @@ export const Home = () => {
 
   const getData = useCallback(async () => {
     window.location.pathname.includes("/tags/")
-      ? dispatch(fetchPostsByTag({ id, currentPage, pageLimit }))
-      : dispatch(fetchPosts({ currentPage, pageLimit }));
-    dispatch(fetchLastTags({ tagsLimit }));
-    dispatch(fetchLastComments({ commentsLimit }));
+      ? dispatch(fetchPostsByTag({ id, page: currentPage, limit: pageLimit }))
+      : dispatch(fetchPosts({ page: currentPage, limit: pageLimit }));
+    dispatch(fetchLastTags({ limit: tagsLimit }));
+    dispatch(fetchLastComments({ limit: commentsLimit }));
   }, [dispatch, id, currentPage]);
 
   useEffect(() => {
@@ -69,8 +52,10 @@ export const Home = () => {
   }, [getData]);
 
   useEffect(() => {
-    dispatch(sort(sortType));
-  }, [sortType, dispatch, posts.status]);
+    if (!isPostsLoading) {
+      dispatch(sort());
+    }
+  }, [sortType, isPostsLoading, dispatch]);
 
   return (
     <>
@@ -86,9 +71,9 @@ export const Home = () => {
       </Tabs>
       <Grid container spacing={4}>
         <Grid sm={8} xs={12} item>
-          {(isPostsLoading ? [...Array(pageLimit)] : posts.items).map(
+          {(isSkeleton ? [...Array(pageLimit)] : posts.items).map(
             (item, index) =>
-              isPostsLoading ? (
+              isSkeleton ? (
                 <Post key={index} isLoading={true} />
               ) : (
                 <Post
@@ -102,19 +87,30 @@ export const Home = () => {
                   commentsCount={item.comments?.length}
                   tags={item.tags}
                   isEditable={userData?._id === item.author._id}
-                  setScroll={setScroll}
                 />
               )
           )}
-          {Math.ceil(total / pageLimit) > currentPage && (
-            <Button variant="contained" onClick={loadMore}>
-              Load more
-            </Button>
-          )}
+          <Button
+            style={{
+              visibility:
+                Math.ceil(total / pageLimit) > currentPage
+                  ? "visible"
+                  : "hidden",
+            }}
+            variant="contained"
+            onClick={loadMore}
+          >
+            Load more
+          </Button>
         </Grid>
         <Grid sm={4} xs={12} item>
-          <TagsBlock items={tags.items} isLoading={isTagsLoading} />
-          <CommentsBlock items={comments.items} isLoading={isCommentsLoading} />
+          <div style={{ position: "sticky", top: 0 }}>
+            <TagsBlock items={tags.items} isLoading={isTagsLoading} />
+            <CommentsBlock
+              items={comments.items}
+              isLoading={isCommentsLoading}
+            />
+          </div>
         </Grid>
       </Grid>
     </>
