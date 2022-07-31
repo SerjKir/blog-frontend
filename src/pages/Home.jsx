@@ -11,7 +11,7 @@ import {
   fetchLastTags,
   setCurrentPage,
   setSortType,
-  sort,
+  resetDefault,
 } from "../redux/slices/posts";
 import { baseEnvUrl } from "../consts";
 import { useParams } from "react-router-dom";
@@ -33,6 +33,7 @@ export const Home = () => {
 
   const handleChange = (event, newValue) => {
     dispatch(setSortType(newValue));
+    dispatch(resetDefault());
   };
 
   const loadMore = () => {
@@ -41,21 +42,24 @@ export const Home = () => {
 
   const getData = useCallback(async () => {
     window.location.pathname.includes("/tags/")
-      ? dispatch(fetchPostsByTag({ id, page: currentPage, limit: pageLimit }))
-      : dispatch(fetchPosts({ page: currentPage, limit: pageLimit }));
+      ? dispatch(
+          fetchPostsByTag({
+            id,
+            sort: sortType,
+            page: currentPage,
+            limit: pageLimit,
+          })
+        )
+      : dispatch(
+          fetchPosts({ sort: sortType, page: currentPage, limit: pageLimit })
+        );
     dispatch(fetchLastTags({ limit: tagsLimit }));
     dispatch(fetchLastComments({ limit: commentsLimit }));
-  }, [dispatch, id, currentPage]);
+  }, [dispatch, id, currentPage, sortType]);
 
   useEffect(() => {
     getData().then();
   }, [getData]);
-
-  useEffect(() => {
-    if (!isPostsLoading) {
-      dispatch(sort());
-    }
-  }, [sortType, isPostsLoading, dispatch]);
 
   return (
     <>
@@ -67,7 +71,7 @@ export const Home = () => {
       >
         <Tab label="New" value={"createdAt"} />
         <Tab label="Popular" value={"viewsCount"} />
-        <Tab label="Most commented" value={"comments"} />
+        <Tab label="Most commented" value={"commentsCount"} />
       </Tabs>
       <Grid container spacing={4}>
         <Grid sm={8} xs={12} item>
@@ -84,7 +88,7 @@ export const Home = () => {
                   user={item.author}
                   createdAt={item.createdAt}
                   viewsCount={item.viewsCount}
-                  commentsCount={item.comments?.length}
+                  commentsCount={item.commentsCount}
                   tags={item.tags}
                   isEditable={userData?._id === item.author._id}
                 />

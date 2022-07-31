@@ -4,9 +4,9 @@ import axios from "../../axios";
 export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",
   async (params) => {
-    const { page, limit } = params;
+    const { sort, page, limit } = params;
     const { data } = await axios.get("/posts", {
-      params: { page, limit },
+      params: { sort, page, limit },
     });
     return data;
   }
@@ -37,9 +37,9 @@ export const fetchLastComments = createAsyncThunk(
 export const fetchPostsByTag = createAsyncThunk(
   "posts/fetchPostsByTag",
   async (params) => {
-    const { id, page, limit } = params;
+    const { id, sort, page, limit } = params;
     const { data } = await axios.get(`/posts/tags/${id}`, {
-      params: { page, limit },
+      params: { sort, page, limit },
     });
     return data;
   }
@@ -75,32 +75,15 @@ const postsSlice = createSlice({
   name: "posts",
   initialState,
   reducers: {
-    sort: (state, value) => {
-      const type = state.sortType;
-      state.posts.items = state.posts.items.sort((a, b) => {
-        if (type === "comments") {
-          return a[type].length < b[type].length ? 1 : -1;
-        } else {
-          return a[type] < b[type] ? 1 : -1;
-        }
-      });
-    },
     setSortType: (state, value) => {
       state.sortType = value.payload;
     },
     setCurrentPage: (state) => {
       state.currentPage = state.currentPage + 1;
     },
-    resetCurrentPage: (state) => {
-      state.currentPage = 1;
-    },
-    resetPosts: (state) => {
-      state.posts.items = [];
-    },
     resetDefault: (state) => {
       state.posts.items = [];
       state.currentPage = 1;
-      // state.sortType = "createdAt";
     },
   },
   extraReducers: {
@@ -166,6 +149,5 @@ const postsSlice = createSlice({
   },
 });
 
-export const { sort, setCurrentPage, setSortType, resetDefault } =
-  postsSlice.actions;
+export const { setCurrentPage, setSortType, resetDefault } = postsSlice.actions;
 export const postsReducer = postsSlice.reducer;
