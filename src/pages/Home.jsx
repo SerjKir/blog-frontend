@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Grid from "@mui/material/Grid";
@@ -15,29 +15,28 @@ import {
 } from "../redux/slices/posts";
 import { baseEnvUrl } from "../consts";
 import { useParams } from "react-router-dom";
-import Button from "@mui/material/Button";
 export const Home = () => {
+  const { id } = useParams();
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.auth.data);
   const { posts, tags, comments, sortType, currentPage, total } = useSelector(
     (state) => state.posts
   );
-  const isPostsLoading = posts.status === "loading";
-  const isTagsLoading = tags.status === "loading";
-  const isCommentsLoading = comments.status === "loading";
-  const { id } = useParams();
+
   const pageLimit = 5,
     commentsLimit = 3,
     tagsLimit = 5;
-  const isSkeleton = isPostsLoading && posts.items.length === 0;
+
+  const isPostSkeleton = posts.status === "loading" && posts.items.length === 0,
+    isTagsSkeleton = tags.status === "loading" && tags.items.length === 0,
+    isCommentsSkeleton =
+      comments.status === "loading" && comments.items.length === 0;
+
+  const isNotLastPage = Math.ceil(total / pageLimit) > currentPage;
 
   const handleChange = (event, newValue) => {
     dispatch(setSortType(newValue));
     dispatch(resetDefault());
-  };
-
-  const loadMore = () => {
-    dispatch(setCurrentPage());
   };
 
   const getData = useCallback(async () => {
@@ -57,6 +56,20 @@ export const Home = () => {
     dispatch(fetchLastComments({ limit: commentsLimit }));
   }, [dispatch, id, currentPage, sortType]);
 
+  const inputRef = useRef();
+  useEffect(() => {
+    if (isNotLastPage && inputRef.current) {
+      const observer = new IntersectionObserver((entries, callback) => {
+        const entry = entries[0];
+        if (entry.isIntersecting) {
+          observer.unobserve(inputRef.current);
+          dispatch(setCurrentPage());
+        }
+      });
+      observer.observe(inputRef.current);
+    }
+  }, [dispatch, isNotLastPage, posts.items]);
+
   useEffect(() => {
     getData().then();
   }, [getData]);
@@ -75,9 +88,9 @@ export const Home = () => {
       </Tabs>
       <Grid container spacing={4}>
         <Grid sm={8} xs={12} item>
-          {(isSkeleton ? [...Array(pageLimit)] : posts.items).map(
+          {(isPostSkeleton ? [...Array(pageLimit)] : posts.items).map(
             (item, index) =>
-              isSkeleton ? (
+              isPostSkeleton ? (
                 <Post key={index} isLoading={true} />
               ) : (
                 <Post
@@ -91,28 +104,17 @@ export const Home = () => {
                   commentsCount={item.commentsCount}
                   tags={item.tags}
                   isEditable={userData?._id === item.author._id}
+                  inputRef={index === posts.items.length - 1 ? inputRef : null}
                 />
               )
           )}
-          <Button
-            style={{
-              visibility:
-                Math.ceil(total / pageLimit) > currentPage
-                  ? "visible"
-                  : "hidden",
-            }}
-            variant="contained"
-            onClick={loadMore}
-          >
-            Load more
-          </Button>
         </Grid>
         <Grid sm={4} xs={12} item>
           <div style={{ position: "sticky", top: 0 }}>
-            <TagsBlock items={tags.items} isLoading={isTagsLoading} />
+            <TagsBlock items={tags.items} isSkeleton={isTagsSkeleton} />
             <CommentsBlock
               items={comments.items}
-              isLoading={isCommentsLoading}
+              isSkeleton={isCommentsSkeleton}
             />
           </div>
         </Grid>

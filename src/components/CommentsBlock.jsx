@@ -10,15 +10,15 @@ import List from "@mui/material/List";
 import Skeleton from "@mui/material/Skeleton";
 import { baseEnvUrl } from "../consts";
 
-export const CommentsBlock = ({ items, children, isLoading = true }) => {
+export const CommentsBlock = ({ items, children, isSkeleton = true }) => {
   return (
     <SideBlock title="Comments">
       <List>
-        {(isLoading ? [...Array(3)] : items)?.map((obj, index) => (
+        {(isSkeleton ? [...Array(3)] : items)?.map((obj, index) => (
           <React.Fragment key={index}>
             <ListItem alignItems="flex-start">
               <ListItemAvatar>
-                {isLoading ? (
+                {isSkeleton ? (
                   <Skeleton variant="circular" width={40} height={40} />
                 ) : (
                   <Avatar
@@ -27,7 +27,7 @@ export const CommentsBlock = ({ items, children, isLoading = true }) => {
                   />
                 )}
               </ListItemAvatar>
-              {isLoading ? (
+              {isSkeleton ? (
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   <Skeleton variant="text" height={24} width={80} />
                   <Skeleton variant="text" height={20} width={160} />

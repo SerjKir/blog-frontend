@@ -26,6 +26,7 @@ export const Post = ({
   isFullPost,
   isLoading,
   isEditable,
+  inputRef,
 }) => {
   const dispatch = useDispatch();
 
@@ -40,7 +41,10 @@ export const Post = ({
   }
 
   return (
-    <div className={clsx(styles.root, { [styles.rootFull]: isFullPost })}>
+    <div
+      className={clsx(styles.root, { [styles.rootFull]: isFullPost })}
+      ref={inputRef}
+    >
       {isEditable && (
         <div className={styles.editButtons}>
           <Link to={`/posts/${id}/edit`}>

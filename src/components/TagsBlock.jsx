@@ -14,7 +14,7 @@ import { NavLink } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { resetDefault } from "../redux/slices/posts";
 
-export const TagsBlock = ({ items, isLoading = true }) => {
+export const TagsBlock = ({ items, isSkeleton = true }) => {
   const dispatch = useDispatch();
   const reset = (name) => {
     if (window.location.pathname !== `/tags/${name}`) {
@@ -24,7 +24,7 @@ export const TagsBlock = ({ items, isLoading = true }) => {
   return (
     <SideBlock title="Tags">
       <List>
-        {(isLoading ? [...Array(5)] : items).map((name, i) => (
+        {(isSkeleton ? [...Array(5)] : items).map((name, i) => (
           <ListItem key={i} disablePadding>
             <NavLink
               to={`/tags/${name}`}
@@ -38,7 +38,7 @@ export const TagsBlock = ({ items, isLoading = true }) => {
                 <ListItemIcon>
                   <TagIcon />
                 </ListItemIcon>
-                {isLoading ? (
+                {isSkeleton ? (
                   <Skeleton width={100} height={32} />
                 ) : (
                   <ListItemText primary={name} />

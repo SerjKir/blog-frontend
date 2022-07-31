@@ -16,6 +16,7 @@ export const FullPost = () => {
   const { id } = useParams();
   const [data, setData] = useState();
   const [comments, setComments] = useState();
+  const [isCommentsLoading, setIsCommentsLoading] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
   const getData = useCallback(async () => {
@@ -30,9 +31,13 @@ export const FullPost = () => {
   }, [id]);
 
   const getComments = useCallback(async () => {
+    setIsCommentsLoading(true);
     await axios
       .get(`posts/${id}/comments`)
-      .then(({ data }) => setComments(data))
+      .then(({ data }) => {
+        setComments(data);
+        setIsCommentsLoading(false);
+      })
       .catch((error) => {
         console.log(error);
       });
@@ -62,7 +67,7 @@ export const FullPost = () => {
           user={data.author}
           createdAt={data.createdAt}
           viewsCount={data.viewsCount}
-          commentsCount={comments?.length}
+          commentsCount={data.commentsCount}
           tags={data.tags}
           isFullPost
         >
@@ -70,7 +75,10 @@ export const FullPost = () => {
         </Post>
       </Grid>
       <Grid sm={4} xs={12} item>
-        <CommentsBlock items={comments} isLoading={false}>
+        <CommentsBlock
+          items={comments}
+          isSkeleton={data.commentsCount !== 0 && isCommentsLoading}
+        >
           {isAuth ? (
             <Index avatar={data.author.avatarUrl} addComment={addComment} />
           ) : (
