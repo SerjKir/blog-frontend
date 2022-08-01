@@ -13,6 +13,7 @@ import { SideBlock } from "./SideBlock";
 import { NavLink } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { resetDefault } from "../redux/slices/posts";
+import { tagsLimit } from "../consts";
 
 export const TagsBlock = ({ items, isSkeleton = true }) => {
   const dispatch = useDispatch();
@@ -24,7 +25,7 @@ export const TagsBlock = ({ items, isSkeleton = true }) => {
   return (
     <SideBlock title="Tags">
       <List>
-        {(isSkeleton ? [...Array(5)] : items).map((name, i) => (
+        {(isSkeleton ? [...Array(tagsLimit)] : items).map((name, i) => (
           <ListItem key={i} disablePadding>
             <NavLink
               to={`/tags/${name}`}

@@ -8,13 +8,13 @@ import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
 import List from "@mui/material/List";
 import Skeleton from "@mui/material/Skeleton";
-import { baseEnvUrl } from "../consts";
+import { baseEnvUrl, commentsLimit } from "../consts";
 
 export const CommentsBlock = ({ items, children, isSkeleton = true }) => {
   return (
     <SideBlock title="Comments">
       <List>
-        {(isSkeleton ? [...Array(3)] : items)?.map((obj, index) => (
+        {(isSkeleton ? [...Array(commentsLimit)] : items)?.map((obj, index) => (
           <React.Fragment key={index}>
             <ListItem alignItems="flex-start">
               <ListItemAvatar>

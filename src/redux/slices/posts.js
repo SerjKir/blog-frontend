@@ -138,10 +138,11 @@ const postsSlice = createSlice({
       state.comments.status = "error";
     },
     //Удаление статьи
-    [fetchRemovePost.pending]: (state, action) => {
-      state.posts.items = state.posts.items.filter(
-        (item) => item._id !== action.meta.arg
-      );
+    [fetchRemovePost.pending]: (state) => {
+      state.posts.status = "loading";
+    },
+    [fetchRemovePost.pending]: (state) => {
+      state.posts.status = "loaded";
     },
     [fetchRemovePost.rejected]: (state) => {
       state.posts.status = "deleting error";

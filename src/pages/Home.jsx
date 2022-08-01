@@ -12,9 +12,11 @@ import {
   setCurrentPage,
   setSortType,
   resetDefault,
+  fetchRemovePost,
 } from "../redux/slices/posts";
-import { baseEnvUrl } from "../consts";
+import { baseEnvUrl, commentsLimit, pageLimit, tagsLimit } from "../consts";
 import { useParams } from "react-router-dom";
+
 export const Home = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
@@ -22,10 +24,6 @@ export const Home = () => {
   const { posts, tags, comments, sortType, currentPage, total } = useSelector(
     (state) => state.posts
   );
-
-  const pageLimit = 5,
-    commentsLimit = 3,
-    tagsLimit = 5;
 
   const isPostSkeleton = posts.status === "loading" && posts.items.length === 0,
     isTagsSkeleton = tags.status === "loading" && tags.items.length === 0,
@@ -37,6 +35,14 @@ export const Home = () => {
   const handleChange = (event, newValue) => {
     dispatch(setSortType(newValue));
     dispatch(resetDefault());
+  };
+
+  const onClickRemove = async (id) => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      await dispatch(fetchRemovePost(id)).then(() => {
+        getData();
+      });
+    }
   };
 
   const getData = useCallback(async () => {
@@ -105,6 +111,7 @@ export const Home = () => {
                   tags={item.tags}
                   isEditable={userData?._id === item.author._id}
                   inputRef={index === posts.items.length - 1 ? inputRef : null}
+                  onRemove={onClickRemove}
                 />
               )
           )}
