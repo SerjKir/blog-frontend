@@ -28,7 +28,11 @@ export const Index = ({ avatar, addComment }) => {
             multiline
             fullWidth
           />
-          <Button onClick={addCommentHandler} variant="contained">
+          <Button
+            disabled={text === ""}
+            onClick={addCommentHandler}
+            variant="contained"
+          >
             Отправить
           </Button>
         </div>

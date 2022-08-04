@@ -21,9 +21,10 @@ export const Login = () => {
   const {
     register,
     handleSubmit,
+    // setError,
     formState: { errors, isValid },
   } = useForm({
-    defaultValues: { email: "admin1@gmail.com", password: "admin1" },
+    defaultValues: { email: "", password: "" },
     mode: "onChange",
   });
 
@@ -34,7 +35,7 @@ export const Login = () => {
     }
     window.localStorage.setItem("token", data.payload);
     dispatch(setToken());
-    dispatch(fetchAuthMe());
+    await dispatch(fetchAuthMe());
   };
 
   if (isAuth) {
@@ -48,20 +49,20 @@ export const Login = () => {
       </Typography>
       <form onSubmit={handleSubmit(onSubmit)}>
         <TextField
+          error={!!errors.email?.message}
+          helperText={errors.email?.message}
           className={styles.field}
           label="E-Mail"
-          error={Boolean(errors.email?.message)}
-          helperText={errors.email?.message}
           fullWidth
           type={"email"}
           {...register("email", { required: "Укажите почту" })}
         />
         <TextField
+          error={!!errors.password?.message}
+          helperText={errors.password?.message}
           className={styles.field}
           label="Пароль"
           fullWidth
-          helperText={errors.password?.message}
-          error={Boolean(errors.password?.message)}
           type={"password"}
           {...register("password", { required: "Укажите пароль" })}
         />

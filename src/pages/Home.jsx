@@ -39,15 +39,14 @@ export const Home = () => {
 
   const onClickRemove = async (id) => {
     if (window.confirm("Are you sure you want to delete this post?")) {
-      await dispatch(fetchRemovePost(id)).then(() => {
-        getData();
-      });
+      await dispatch(fetchRemovePost(id));
+      await getData();
     }
   };
 
   const getData = useCallback(async () => {
     window.location.pathname.includes("/tags/")
-      ? dispatch(
+      ? await dispatch(
           fetchPostsByTag({
             id,
             sort: sortType,
@@ -55,11 +54,11 @@ export const Home = () => {
             limit: pageLimit,
           })
         )
-      : dispatch(
+      : await dispatch(
           fetchPosts({ sort: sortType, page: currentPage, limit: pageLimit })
         );
-    dispatch(fetchLastTags({ limit: tagsLimit }));
-    dispatch(fetchLastComments({ limit: commentsLimit }));
+    await dispatch(fetchLastTags({ limit: tagsLimit }));
+    await dispatch(fetchLastComments({ limit: commentsLimit }));
   }, [dispatch, id, currentPage, sortType]);
 
   const inputRef = useRef();

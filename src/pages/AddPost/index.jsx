@@ -9,25 +9,28 @@ import TextField from "@mui/material/TextField";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import SimpleMDE from "react-simplemde-editor";
-import { useNavigate, Navigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "easymde/dist/easymde.min.css";
 import styles from "./AddPost.module.scss";
-import { useSelector } from "react-redux";
-import { selectIsAuth } from "../../redux/slices/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAuthMe } from "../../redux/slices/auth";
 import axios from "../../axios";
 import { baseEnvUrl } from "../../consts";
+import { LinearProgress } from "@mui/material";
 
 export const AddPost = () => {
+  const dispatch = useDispatch();
+  const userData = useSelector((state) => state.auth);
+  const isLoading = userData.status === "loading";
   const { id } = useParams();
   const navigate = useNavigate();
-  const isAuth = useSelector(selectIsAuth);
   const [text, setText] = useState("");
   const [title, setTitle] = useState("");
   const [tags, setTags] = useState("");
   const inputFileRef = useRef(null);
   const [imageUrl, setImageUrl] = useState(null);
 
-  const isEditing = Boolean(id);
+  const isEditing = !!id;
 
   const handleChangeFile = async (event) => {
     try {
@@ -77,7 +80,7 @@ export const AddPost = () => {
       const { data } = isEditing
         ? await axios.patch(`/posts/${id}`, fields)
         : await axios.post("/posts", fields);
-      const _id = isEditing ? id : data._id;
+      const _id = isEditing ? id : data;
       navigate(`/posts/${_id}`);
     } catch (error) {
       console.warn(error);
@@ -86,22 +89,29 @@ export const AddPost = () => {
   };
 
   const getData = useCallback(async () => {
-    await axios.get(`/posts/${id}`).then(({ data }) => {
-      setTitle(data.title);
-      setText(data.text);
-      setImageUrl(data.imageUrl);
-      setTags(data.tags?.join(","));
-    });
+    const { data } = await axios.get(`/posts/${id}`);
+    setTitle(data.title);
+    setText(data.text);
+    setImageUrl(data.imageUrl);
+    setTags(data.tags?.join(","));
   }, [id]);
+
+  const getUserData = useCallback(async () => {
+    await dispatch(fetchAuthMe());
+  }, [dispatch]);
+
+  useEffect(() => {
+    getUserData().then();
+  }, [getUserData]);
 
   useEffect(() => {
     if (id) {
-      getData();
+      getData().then();
     }
   }, [getData, id]);
 
-  if (!isAuth) {
-    return <Navigate to={"/"} />;
+  if (isLoading) {
+    return <LinearProgress />;
   }
 
   return (

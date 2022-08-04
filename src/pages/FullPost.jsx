@@ -8,39 +8,28 @@ import axios from "../axios";
 import ReactMarkdown from "react-markdown";
 import { baseEnvUrl } from "../consts";
 import { useSelector } from "react-redux";
-import { selectIsAuth } from "../redux/slices/auth";
 import Grid from "@mui/material/Grid";
 
 export const FullPost = () => {
-  const isAuth = useSelector(selectIsAuth);
+  const userData = useSelector((state) => state.auth);
   const { id } = useParams();
   const [data, setData] = useState();
   const [comments, setComments] = useState();
   const [isCommentsLoading, setIsCommentsLoading] = useState(false);
-
   const [isLoading, setIsLoading] = useState(true);
+
   const getData = useCallback(async () => {
     setIsLoading(true);
-    await axios
-      .get(`/posts/${id}`)
-      .then(({ data }) => setData(data))
-      .catch((error) => {
-        console.log(error);
-      });
+    const { data } = await axios.get(`/posts/${id}`);
+    setData(data);
     setIsLoading(false);
   }, [id]);
 
   const getComments = useCallback(async () => {
     setIsCommentsLoading(true);
-    await axios
-      .get(`posts/${id}/comments`)
-      .then(({ data }) => {
-        setComments(data);
-        setIsCommentsLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    const { data } = await axios.get(`posts/${id}/comments`);
+    setComments(data);
+    setIsCommentsLoading(false);
   }, [id]);
 
   const addComment = async (text) => {
@@ -75,16 +64,18 @@ export const FullPost = () => {
         </Post>
       </Grid>
       <Grid sm={4} xs={12} item>
-        <CommentsBlock
-          items={comments}
-          isSkeleton={data.commentsCount !== 0 && isCommentsLoading}
-        >
-          {isAuth ? (
-            <Index avatar={data.author.avatarUrl} addComment={addComment} />
-          ) : (
-            ""
-          )}
-        </CommentsBlock>
+        <div style={{ position: "sticky", top: 0 }}>
+          <CommentsBlock
+            items={comments}
+            isSkeleton={data.commentsCount !== 0 && isCommentsLoading}
+          >
+            {userData.token ? (
+              <Index avatar={userData.data.avatarUrl} addComment={addComment} />
+            ) : (
+              ""
+            )}
+          </CommentsBlock>
+        </div>
       </Grid>
     </Grid>
   );

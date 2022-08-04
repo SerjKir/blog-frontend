@@ -17,13 +17,13 @@ export const Registration = () => {
   const {
     register,
     handleSubmit,
-    setError,
+    // setError,
     formState: { errors, isValid },
   } = useForm({
     defaultValues: {
-      fullName: "admin11",
-      email: "admin11@gmail.com",
-      password: "admin11",
+      fullName: "",
+      email: "",
+      password: "",
     },
     mode: "onChange",
   });
@@ -53,7 +53,7 @@ export const Registration = () => {
       </div>
       <form onSubmit={handleSubmit(onSubmit)}>
         <TextField
-          error={Boolean(errors.fullName?.message)}
+          error={!!errors.fullName?.message}
           helperText={errors.fullName?.message}
           className={styles.field}
           label="Полное имя"
@@ -61,7 +61,7 @@ export const Registration = () => {
           {...register("fullName", { required: "Укажите имя" })}
         />
         <TextField
-          error={Boolean(errors.email?.message)}
+          error={!!errors.email?.message}
           helperText={errors.email?.message}
           type={"email"}
           className={styles.field}
@@ -70,7 +70,7 @@ export const Registration = () => {
           {...register("email", { required: "Укажите почту" })}
         />
         <TextField
-          error={Boolean(errors.password?.message)}
+          error={!!errors.password?.message}
           helperText={errors.password?.message}
           type={"password"}
           className={styles.field}
