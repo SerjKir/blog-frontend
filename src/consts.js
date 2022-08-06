@@ -4,3 +4,15 @@ export const baseEnvUrl =
 export const pageLimit = 5,
   commentsLimit = 3,
   tagsLimit = 5;
+
+export const removeToken = () => {
+  window.localStorage.removeItem("token");
+};
+
+export const getToken = () => {
+  return window.localStorage.getItem("token");
+};
+
+export const addToken = (token) => {
+  window.localStorage.setItem("token", token);
+};

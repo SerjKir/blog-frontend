@@ -22,7 +22,7 @@ export const Index = ({ avatar, addComment }) => {
           <TextField
             onChange={(e) => setText(e.target.value)}
             value={text}
-            label="Написать комментарий"
+            label="Your comment"
             variant="outlined"
             maxRows={10}
             multiline
@@ -33,7 +33,7 @@ export const Index = ({ avatar, addComment }) => {
             onClick={addCommentHandler}
             variant="contained"
           >
-            Отправить
+            Send
           </Button>
         </div>
       </div>

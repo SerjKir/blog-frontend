@@ -5,12 +5,14 @@ import { Link } from "react-router-dom";
 import styles from "./Header.module.scss";
 import Container from "@mui/material/Container";
 import { useDispatch, useSelector } from "react-redux";
-import { logout, selectIsAuth } from "../../redux/slices/auth";
+import { logout } from "../../redux/slices/auth";
 import { resetDefault } from "../../redux/slices/posts";
+import { baseEnvUrl } from "../../consts";
+import Avatar from "@mui/material/Avatar";
 
 export const Header = () => {
   const dispatch = useDispatch();
-  const isAuth = useSelector(selectIsAuth);
+  const { data, token } = useSelector((state) => state.auth);
   const reset = () => {
     if (window.location.pathname !== "/") {
       dispatch(resetDefault());
@@ -32,10 +34,21 @@ export const Header = () => {
             <div onClick={reset}>Main</div>
           </Link>
           <div className={styles.buttons}>
-            {isAuth ? (
+            {token ? (
               <>
                 <Link to="/profile">
-                  <Button variant="contained">My profile</Button>
+                  <Button variant="contained">
+                    <span>{data?.fullName}</span>
+                    <Avatar
+                      src={baseEnvUrl + data?.avatarUrl}
+                      alt={data?.fullName}
+                      sx={{
+                        height: "25px",
+                        width: "25px;",
+                        marginLeft: "5px",
+                      }}
+                    />
+                  </Button>
                 </Link>
                 <Link to="/add-post">
                   <Button variant="contained">Create post</Button>

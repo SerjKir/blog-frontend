@@ -4,58 +4,59 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { baseEnvUrl } from "../../consts";
-import { fetchAuthMe } from "../../redux/slices/auth";
 import { LinearProgress } from "@mui/material";
-import axios from "../../axios";
 import Paper from "@mui/material/Paper";
+import { updateMe, uploadAvatar } from "../../api/userApi";
+import { check, fetchMe } from "../../redux/slices/auth";
 
 export const Profile = () => {
   const dispatch = useDispatch();
-  const userData = useSelector((state) => state.auth);
-  const isLoading = userData.status === "loading";
+  const { token, data, status } = useSelector((state) => state.auth);
+  const isLoading = status === "loading";
+  const isAuth = !!token;
 
-  const [data, setData] = useState({
+  const [userData, setUserData] = useState({
     fullName: "",
     email: "",
     avatarUrl: null,
   });
 
+  const checkIsAuth = useCallback(async () => {
+    await dispatch(check());
+  }, [dispatch]);
+
   const selectAvatar = async (event) => {
     const formData = new FormData();
     const file = event.target.files[0];
     formData.append("image", file);
-    const res = await axios.post("/upload-avatar", formData);
-    setData({ ...data, avatarUrl: res.data });
+    const res = await uploadAvatar(formData);
+    setUserData({ ...userData, avatarUrl: res });
   };
-
-  const getData = useCallback(async () => {
-    dispatch(fetchAuthMe());
-  }, [dispatch]);
 
   const saveData = async () => {
-    const res = await axios.patch("/auth/me", data);
-    setData(res.data);
+    await updateMe(userData);
+    await dispatch(fetchMe());
   };
 
   useEffect(() => {
-    getData().then();
-  }, [getData]);
+    checkIsAuth().then();
+  }, [checkIsAuth]);
 
   useEffect(() => {
-    if (!isLoading) {
-      setData(userData.data);
+    if (!isLoading && isAuth) {
+      setUserData(data);
     }
-  }, [userData.data, isLoading]);
+  }, [data, isLoading, isAuth]);
 
-  if (isLoading) {
+  if (isLoading || !isAuth) {
     return <LinearProgress />;
   }
 
   return (
     <Paper className={styles.root}>
       <img
-        src={baseEnvUrl + data.avatarUrl}
-        alt={data.fullName}
+        src={baseEnvUrl + userData.avatarUrl}
+        alt={userData.fullName}
         className={styles.image}
       />
       <div className={styles.buttons}>
@@ -69,20 +70,22 @@ export const Profile = () => {
         label="Name"
         variant="outlined"
         className={styles.input}
-        value={data.fullName}
-        onChange={(event) => setData({ ...data, fullName: event.target.value })}
+        value={userData.fullName}
+        onChange={(event) =>
+          setUserData({ ...userData, fullName: event.target.value })
+        }
       />
       <TextField
         id="outlined-basic"
         label="Email"
         variant="outlined"
         className={styles.input}
-        value={data.email}
+        value={userData.email}
         type={"email"}
         disabled
       />
       <Button
-        disabled={data.fullName === ""}
+        disabled={userData.fullName === ""}
         variant={"contained"}
         type={"submit"}
         sx={{ marginTop: "10px" }}

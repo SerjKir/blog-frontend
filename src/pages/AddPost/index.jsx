@@ -12,16 +12,22 @@ import SimpleMDE from "react-simplemde-editor";
 import { useNavigate, useParams } from "react-router-dom";
 import "easymde/dist/easymde.min.css";
 import styles from "./AddPost.module.scss";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchAuthMe } from "../../redux/slices/auth";
-import axios from "../../axios";
 import { baseEnvUrl } from "../../consts";
 import { LinearProgress } from "@mui/material";
+import {
+  addPost,
+  getPost,
+  updatePost,
+  uploadPostImage,
+} from "../../api/postApi";
+import { useDispatch, useSelector } from "react-redux";
+import { check } from "../../redux/slices/auth";
 
 export const AddPost = () => {
   const dispatch = useDispatch();
-  const userData = useSelector((state) => state.auth);
-  const isLoading = userData.status === "loading";
+  const { token, status } = useSelector((state) => state.auth);
+  const isLoading = status === "loading";
+  const isAuth = !!token;
   const { id } = useParams();
   const navigate = useNavigate();
   const [text, setText] = useState("");
@@ -37,8 +43,8 @@ export const AddPost = () => {
       const formData = new FormData();
       const file = event.target.files[0];
       formData.append("image", file);
-      const { data } = await axios.post("/upload", formData);
-      setImageUrl(data.url);
+      const data = await uploadPostImage(formData);
+      setImageUrl(data);
     } catch (error) {
       console.warn(error);
       alert("Ошибка при загрузке файла");
@@ -78,8 +84,8 @@ export const AddPost = () => {
         tags,
       };
       const { data } = isEditing
-        ? await axios.patch(`/posts/${id}`, fields)
-        : await axios.post("/posts", fields);
+        ? await updatePost(id, fields)
+        : await addPost(fields);
       const _id = isEditing ? id : data;
       navigate(`/posts/${_id}`);
     } catch (error) {
@@ -89,20 +95,20 @@ export const AddPost = () => {
   };
 
   const getData = useCallback(async () => {
-    const { data } = await axios.get(`/posts/${id}`);
+    const data = await getPost(id);
     setTitle(data.title);
     setText(data.text);
     setImageUrl(data.imageUrl);
     setTags(data.tags?.join(","));
   }, [id]);
 
-  const getUserData = useCallback(async () => {
-    await dispatch(fetchAuthMe());
+  const checkIsAuth = useCallback(async () => {
+    await dispatch(check());
   }, [dispatch]);
 
   useEffect(() => {
-    getUserData().then();
-  }, [getUserData]);
+    checkIsAuth().then();
+  }, [checkIsAuth]);
 
   useEffect(() => {
     if (id) {
@@ -110,7 +116,7 @@ export const AddPost = () => {
     }
   }, [getData, id]);
 
-  if (isLoading) {
+  if (isLoading || !isAuth) {
     return <LinearProgress />;
   }
 

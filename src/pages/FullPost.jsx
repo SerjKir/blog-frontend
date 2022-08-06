@@ -4,36 +4,37 @@ import { Post } from "../components";
 import { Index } from "../components";
 import { CommentsBlock } from "../components";
 import { useParams } from "react-router-dom";
-import axios from "../axios";
 import ReactMarkdown from "react-markdown";
 import { baseEnvUrl } from "../consts";
 import { useSelector } from "react-redux";
 import Grid from "@mui/material/Grid";
+import { addComment, getPost, getPostComments } from "../api/postApi";
 
 export const FullPost = () => {
-  const userData = useSelector((state) => state.auth);
+  const { token, data } = useSelector((state) => state.auth);
+  const isAuth = !!token;
   const { id } = useParams();
-  const [data, setData] = useState();
+  const [userData, setUserData] = useState();
   const [comments, setComments] = useState();
   const [isCommentsLoading, setIsCommentsLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const getData = useCallback(async () => {
     setIsLoading(true);
-    const { data } = await axios.get(`/posts/${id}`);
-    setData(data);
+    const data = await getPost(id);
+    setUserData(data);
     setIsLoading(false);
   }, [id]);
 
   const getComments = useCallback(async () => {
     setIsCommentsLoading(true);
-    const { data } = await axios.get(`posts/${id}/comments`);
+    const data = await getPostComments(id);
     setComments(data);
     setIsCommentsLoading(false);
   }, [id]);
 
-  const addComment = async (text) => {
-    await axios.post(`/posts/${id}/comments`, { text });
+  const handleAddComment = async (text) => {
+    await addComment(id, text);
     await getComments();
   };
 
@@ -50,29 +51,27 @@ export const FullPost = () => {
     <Grid container spacing={4}>
       <Grid sm={8} xs={12} item>
         <Post
-          id={data._id}
-          title={data.title}
-          imageUrl={data.imageUrl ? baseEnvUrl + data.imageUrl : ""}
-          user={data.author}
-          createdAt={data.createdAt}
-          viewsCount={data.viewsCount}
-          commentsCount={data.commentsCount}
-          tags={data.tags}
+          id={userData._id}
+          title={userData.title}
+          imageUrl={userData.imageUrl ? baseEnvUrl + userData.imageUrl : ""}
+          user={userData.author}
+          createdAt={userData.createdAt}
+          viewsCount={userData.viewsCount}
+          commentsCount={userData.commentsCount}
+          tags={userData.tags}
           isFullPost
         >
-          <ReactMarkdown children={data.text} />
+          <ReactMarkdown children={userData.text} />
         </Post>
       </Grid>
       <Grid sm={4} xs={12} item>
         <div style={{ position: "sticky", top: 0 }}>
           <CommentsBlock
             items={comments}
-            isSkeleton={data.commentsCount !== 0 && isCommentsLoading}
+            isSkeleton={userData.commentsCount !== 0 && isCommentsLoading}
           >
-            {userData.token ? (
-              <Index avatar={userData.data.avatarUrl} addComment={addComment} />
-            ) : (
-              ""
+            {isAuth && (
+              <Index avatar={data.avatarUrl} addComment={handleAddComment} />
             )}
           </CommentsBlock>
         </div>

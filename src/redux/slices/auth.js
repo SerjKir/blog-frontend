@@ -1,12 +1,9 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "../../axios";
-
-const initToken = () => {
-  return window.localStorage.getItem("token");
-};
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { checkAuth, login, me, registration } from "../../api/userApi";
+import { getToken, removeToken } from "../../consts";
 
 const initialState = {
-  token: initToken(),
+  token: getToken(),
   data: null,
   status: "loading",
 };
@@ -14,53 +11,70 @@ const initialState = {
 export const fetchRegister = createAsyncThunk(
   "auth/fetchRegister",
   async (params) => {
-    const { data } = await axios.post("/auth/registration", params);
-    return data;
+    return await registration(params);
   }
 );
 
-export const fetchAuth = createAsyncThunk("auth/fetchAuth", async (params) => {
-  const { data } = await axios.post("/auth/login", params);
-  return data;
+export const fetchLogin = createAsyncThunk(
+  "auth/fetchLogin",
+  async (params) => {
+    return await login(params);
+  }
+);
+
+export const fetchMe = createAsyncThunk("auth/fetchMe", async () => {
+  return await me();
 });
 
-export const fetchAuthMe = createAsyncThunk(
-  "auth/fetchAuthMe",
-  async (params) => {
-    const { data } = await axios.get("/auth/me");
-    return data;
-  }
-);
+export const check = createAsyncThunk("auth/checkAuth", async () => {
+  return await checkAuth();
+});
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
     logout: (state) => {
-      window.localStorage.removeItem("token");
+      removeToken();
       state.token = null;
       state.data = null;
       state.status = "logout";
     },
     setToken: (state) => {
-      state.token = initToken();
+      state.token = getToken();
     },
   },
   extraReducers: {
-    [fetchAuthMe.pending]: (state) => {
+    //Проверка авторизации
+    [check.pending]: (state) => {
+      state.status = "loading";
+    },
+    [check.fulfilled]: (state, action) => {
+      state.token = getToken();
+      state.status = "loaded";
+    },
+    [check.rejected]: (state) => {
+      removeToken();
+      state.token = null;
+      state.data = null;
+      state.status = "unauthorized";
+    },
+    //Получение данных о пользователе
+    [fetchMe.pending]: (state) => {
       state.data = null;
       state.status = "loading";
     },
-    [fetchAuthMe.fulfilled]: (state, action) => {
+    [fetchMe.fulfilled]: (state, action) => {
       state.data = action.payload;
       state.status = "loaded";
     },
-    [fetchAuthMe.rejected]: (state) => {
-      window.localStorage.removeItem("token");
+    [fetchMe.rejected]: (state) => {
+      removeToken();
       state.token = null;
       state.data = null;
       state.status = "error";
     },
+    //Регистрация пользователя
     [fetchRegister.pending]: (state) => {
       state.data = null;
       state.status = "loading";
@@ -70,7 +84,7 @@ const authSlice = createSlice({
       state.status = "loaded";
     },
     [fetchRegister.rejected]: (state) => {
-      window.localStorage.removeItem("token");
+      removeToken();
       state.token = null;
       state.data = null;
       state.status = "error";

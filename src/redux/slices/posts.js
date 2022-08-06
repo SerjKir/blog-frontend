@@ -1,56 +1,37 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "../../axios";
+import {
+  getLastComments,
+  getLastTags,
+  getPosts,
+  getPostsByTag,
+  removePost,
+} from "../../api/postApi";
 
 export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",
-  async (params) => {
-    const { sort, page, limit } = params;
-    const { data } = await axios.get("/posts", {
-      params: { sort, page, limit },
-    });
-    return data;
-  }
+  async (params) => await getPosts(params)
 );
 
 export const fetchLastTags = createAsyncThunk(
   "posts/fetchTags",
-  async (params) => {
-    const { limit } = params;
-    const { data } = await axios.get("/posts/tags", {
-      params: { limit },
-    });
-    return data;
-  }
+  async (params) => await getLastTags(params)
 );
 
 export const fetchLastComments = createAsyncThunk(
   "posts/fetchComments",
-  async (params) => {
-    const { limit } = params;
-    const { data } = await axios.get("/posts/comments", {
-      params: { limit },
-    });
-    return data;
-  }
+  async (params) => await getLastComments(params)
 );
 
 export const fetchPostsByTag = createAsyncThunk(
   "posts/fetchPostsByTag",
   async (params) => {
-    const { id, sort, page, limit } = params;
-    const { data } = await axios.get(`/posts/tags/${id}`, {
-      params: { sort, page, limit },
-    });
-    return data;
+    return await getPostsByTag(params);
   }
 );
 
 export const fetchRemovePost = createAsyncThunk(
   "posts/fetchRemovePost",
-  async (id) => {
-    await axios.delete(`/posts/${id}`);
-    return id;
-  }
+  async (id) => await removePost(id)
 );
 
 const initialState = {

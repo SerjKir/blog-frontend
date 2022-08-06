@@ -4,19 +4,15 @@ import TextField from "@mui/material/TextField";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import { useForm } from "react-hook-form";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import styles from "./Login.module.scss";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchAuth,
-  setToken,
-  selectIsAuth,
-  fetchAuthMe,
-} from "../../redux/slices/auth";
+import { useDispatch } from "react-redux";
+import { fetchLogin, setToken, fetchMe } from "../../redux/slices/auth";
+import { addToken } from "../../consts";
 
 export const Login = () => {
-  const isAuth = useSelector(selectIsAuth);
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
     register,
@@ -29,18 +25,15 @@ export const Login = () => {
   });
 
   const onSubmit = async (values) => {
-    const data = await dispatch(fetchAuth(values));
+    const data = await dispatch(fetchLogin(values));
     if (!data.payload || data.payload === "") {
       return alert("Не удалось авторизоваться");
     }
-    window.localStorage.setItem("token", data.payload);
+    addToken(data.payload);
     dispatch(setToken());
-    await dispatch(fetchAuthMe());
+    await dispatch(fetchMe());
+    navigate("/", { replace: true });
   };
-
-  if (isAuth) {
-    return <Navigate to={"/"} />;
-  }
 
   return (
     <Paper classes={{ root: styles.root }}>

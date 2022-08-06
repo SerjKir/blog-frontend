@@ -6,13 +6,14 @@ import Button from "@mui/material/Button";
 import Avatar from "@mui/material/Avatar";
 
 import styles from "./Login.module.scss";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchRegister, selectIsAuth, setToken } from "../../redux/slices/auth";
+import { useDispatch } from "react-redux";
+import { fetchMe, fetchRegister, setToken } from "../../redux/slices/auth";
 import { useForm } from "react-hook-form";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { addToken } from "../../consts";
 
 export const Registration = () => {
-  const isAuth = useSelector(selectIsAuth);
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
     register,
@@ -30,18 +31,14 @@ export const Registration = () => {
 
   const onSubmit = async (values) => {
     const data = await dispatch(fetchRegister(values));
-    if (!data.payload) {
+    if (!data.payload || data.payload === "") {
       return alert("Не удалось зарегестрироваться");
     }
-    if ("token" in data.payload) {
-      window.localStorage.setItem("token", data.payload.token);
-    }
+    addToken(data.payload);
     dispatch(setToken());
+    await dispatch(fetchMe());
+    navigate("/", { replace: true });
   };
-
-  if (isAuth) {
-    return <Navigate to={"/"} />;
-  }
 
   return (
     <Paper classes={{ root: styles.root }}>

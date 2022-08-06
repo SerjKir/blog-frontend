@@ -4,14 +4,15 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { Header } from "./components";
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useEffect } from "react";
-import { fetchAuthMe, selectIsAuth } from "./redux/slices/auth";
+import { fetchMe, selectIsAuth } from "./redux/slices/auth";
 import { authRoutes, publicRoutes } from "./routes";
 
 function App() {
   const dispatch = useDispatch();
   const getUserData = useCallback(async () => {
-    await dispatch(fetchAuthMe());
+    await dispatch(fetchMe());
   }, [dispatch]);
+
   useEffect(() => {
     getUserData().then();
   }, [getUserData]);
